@@ -61,8 +61,6 @@
               <i data-lucide="refresh-cw"></i>
             </button>
             <button class="button secondary" type="button" id="demo-button">Demo</button>
-            <button class="button secondary" type="button" id="outlook-desktop-button" data-local-only>Outlook Desktop</button>
-            <button class="button primary" type="button" id="signin-button" data-local-only>Sign in</button>
             <button class="button secondary hidden" type="button" id="signout-button">Sign out</button>
           </div>
         </section>
@@ -84,44 +82,10 @@
 
         <section id="settings-view" class="view" aria-label="Settings">
           <div class="settings-grid">
-            <form id="settings-form" class="settings-form">
-              <h2>Connection</h2>
-              <label data-local-only>
-                Microsoft client ID
-                <input id="client-id-input" name="clientId" type="text" spellcheck="false" autocomplete="off" />
-              </label>
-              <label data-local-only>
-                Tenant
-                <input id="tenant-input" name="tenant" type="text" spellcheck="false" autocomplete="off" />
-              </label>
-              <label data-local-only>
-                Outlook Desktop mailbox
-                <input id="outlook-mailbox-input" name="outlookMailbox" type="email" spellcheck="false" autocomplete="email" placeholder="user@example.com" />
-              </label>
-              <label data-local-only>
-                OpenAI API key
-                <input id="openai-key-input" name="openaiKey" type="password" autocomplete="off" />
-              </label>
-              <label data-local-only>
-                OpenAI model
-                <input id="openai-model-input" name="openaiModel" type="text" spellcheck="false" autocomplete="off" />
-              </label>
-              <div class="form-row">
-                <button class="button primary" type="submit">Save</button>
-                <button class="button secondary" type="button" id="clear-settings-button">Clear</button>
-              </div>
-            </form>
-
-            <section class="setup-panel" aria-label="Setup checklist" data-local-only>
-              <h2>Setup</h2>
-              <ol>
-                <li>For the easiest school setup, use <strong>Outlook Desktop</strong> if the desktop app is already signed in.</li>
-                <li>Create a Microsoft Entra app registration for a single-page app.</li>
-                <li>Add <code>http://localhost:8787</code> as the redirect URI.</li>
-                <li>Allow delegated Graph permissions: <code>User.Read</code>, <code>Mail.Read</code>, and <code>Mail.ReadWrite</code>.</li>
-                <li>Paste the client ID here and sign in.</li>
-              </ol>
-              <p>Draft replies are created in Outlook and are never sent automatically.</p>
+            <section class="setup-panel" aria-label="Demo details">
+              <h2>Hosted demo</h2>
+              <p>This public version is UI-only. It does not connect to Outlook, Microsoft Graph, OpenAI, or local files.</p>
+              <p>Run the project locally to use Outlook Desktop, AI, and draft replies.</p>
             </section>
           </div>
         </section>

@@ -37,14 +37,14 @@ No npm packages are required.
 From Command Prompt:
 
 ```cmd
-cd /d "C:\Users\maxda\OneDrive - Bromsgrove School\Documents\school-email-dashboard"
+cd /d "<project-folder>"
 start-dashboard.cmd
 ```
 
 Or with Node directly:
 
 ```powershell
-cd "C:\Users\maxda\OneDrive - Bromsgrove School\Documents\school-email-dashboard"
+cd "<project-folder>"
 node server.js
 ```
 
@@ -150,4 +150,4 @@ foreach ($script in $scripts) {
 
 Netlify is not the best fit for the full version of this app because the main functionality depends on a local Node server, Windows PowerShell, and Outlook Desktop automation.
 
-Netlify could host a static demo-only version, but it cannot run the local Outlook Desktop connector. For the real dashboard, run it locally.
+This repository publishes a safe static demo from `public-demo`. The hosted version hides Outlook Desktop, Microsoft sign-in, OpenAI key entry, and draft creation. For the real dashboard, run it locally.
