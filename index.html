@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>School Mail Priorities</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js" defer></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="side-panel" aria-label="Dashboard controls">
+        <div class="brand-block">
+          <div class="brand-mark" aria-hidden="true">M</div>
+          <div>
+            <h1>Mail Priorities</h1>
+            <p id="account-label">Demo workspace</p>
+          </div>
+        </div>
+
+        <nav class="nav-stack" aria-label="Primary">
+          <button class="nav-item active" type="button" data-view="dashboard">
+            <i data-lucide="inbox"></i>
+            <span>Inbox</span>
+          </button>
+          <button class="nav-item" type="button" data-view="settings">
+            <i data-lucide="settings"></i>
+            <span>Settings</span>
+          </button>
+        </nav>
+
+        <div class="status-panel">
+          <div class="status-row">
+            <span>Connection</span>
+            <strong id="connection-status">Demo</strong>
+          </div>
+          <div class="status-row">
+            <span>Messages</span>
+            <strong id="message-count">0</strong>
+          </div>
+          <div class="status-row">
+            <span>AI</span>
+            <strong id="ai-status">Local</strong>
+          </div>
+        </div>
+      </aside>
+
+      <main>
+        <section class="topbar" aria-label="Account actions">
+          <div class="search-wrap">
+            <i data-lucide="search"></i>
+            <input id="search-input" type="search" placeholder="Search sender, subject, preview" autocomplete="off" />
+          </div>
+          <div class="action-row">
+            <button class="icon-button" type="button" id="refresh-button" title="Refresh inbox" aria-label="Refresh inbox">
+              <i data-lucide="refresh-cw"></i>
+            </button>
+            <button class="button secondary" type="button" id="demo-button">Demo</button>
+            <button class="button secondary" type="button" id="outlook-desktop-button">Outlook Desktop</button>
+            <button class="button primary" type="button" id="signin-button">Sign in</button>
+            <button class="button secondary hidden" type="button" id="signout-button">Sign out</button>
+          </div>
+        </section>
+
+        <section id="dashboard-view" class="view active-view" aria-label="Priority inbox">
+          <div class="dashboard-header">
+            <div>
+              <h2>Priority inbox</h2>
+              <p id="last-updated">Ready</p>
+            </div>
+            <div class="segmented" role="group" aria-label="AI consent mode">
+              <button type="button" class="active" data-consent-mode="ask">Ask</button>
+              <button type="button" data-consent-mode="local">Local</button>
+            </div>
+          </div>
+
+          <div id="priority-list" class="priority-list" aria-live="polite"></div>
+        </section>
+
+        <section id="settings-view" class="view" aria-label="Settings">
+          <div class="settings-grid">
+            <form id="settings-form" class="settings-form">
+              <h2>Connection</h2>
+              <label>
+                Microsoft client ID
+                <input id="client-id-input" name="clientId" type="text" spellcheck="false" autocomplete="off" />
+              </label>
+              <label>
+                Tenant
+                <input id="tenant-input" name="tenant" type="text" spellcheck="false" autocomplete="off" />
+              </label>
+              <label>
+                Outlook Desktop mailbox
+                <input id="outlook-mailbox-input" name="outlookMailbox" type="email" spellcheck="false" autocomplete="email" />
+              </label>
+              <label>
+                OpenAI API key
+                <input id="openai-key-input" name="openaiKey" type="password" autocomplete="off" />
+              </label>
+              <label>
+                OpenAI model
+                <input id="openai-model-input" name="openaiModel" type="text" spellcheck="false" autocomplete="off" />
+              </label>
+              <div class="form-row">
+                <button class="button primary" type="submit">Save</button>
+                <button class="button secondary" type="button" id="clear-settings-button">Clear</button>
+              </div>
+            </form>
+
+            <section class="setup-panel" aria-label="Setup checklist">
+              <h2>Setup</h2>
+              <ol>
+                <li>For the easiest school setup, use <strong>Outlook Desktop</strong> if the desktop app is already signed in.</li>
+                <li>Create a Microsoft Entra app registration for a single-page app.</li>
+                <li>Add <code>http://localhost:8787</code> as the redirect URI.</li>
+                <li>Allow delegated Graph permissions: <code>User.Read</code>, <code>Mail.Read</code>, and <code>Mail.ReadWrite</code>.</li>
+                <li>Paste the client ID here and sign in.</li>
+              </ol>
+              <p>Draft replies are created in Outlook and are never sent automatically.</p>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+    <dialog id="mail-dialog">
+      <div class="dialog-header">
+        <div>
+          <h3 id="dialog-title">Message</h3>
+          <p id="dialog-subtitle"></p>
+        </div>
+        <button class="icon-button" type="button" id="dialog-close" title="Close" aria-label="Close">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div id="dialog-body" class="dialog-body"></div>
+      <div class="dialog-actions">
+        <button class="button secondary" type="button" id="dialog-copy">Copy</button>
+        <button class="button primary hidden" type="button" id="dialog-draft">Create draft</button>
+      </div>
+    </dialog>
+
+    <dialog id="consent-dialog">
+      <form method="dialog" class="consent-box">
+        <h3>AI approval</h3>
+        <p id="consent-text">This will send the selected email content to the configured AI provider.</p>
+        <div class="dialog-actions">
+          <button class="button secondary" value="cancel">Cancel</button>
+          <button class="button primary" value="approve">Approve</button>
+        </div>
+      </form>
+    </dialog>
+  </body>
+</html>
