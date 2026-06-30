@@ -4,3 +4,5 @@
 node_modules/
 debug-output/
 .netlify/
+.env
+.env.local

@@ -8,6 +8,9 @@ const port = Number(process.env.PORT || 8787);
 const host = "127.0.0.1";
 const helperTimeoutMs = 45_000;
 
+loadLocalEnv(path.join(root, ".env"));
+loadLocalEnv(path.join(root, ".env.local"));
+
 const types = {
   ".css": "text/css; charset=utf-8",
   ".html": "text/html; charset=utf-8",
@@ -28,7 +31,7 @@ const server = http.createServer((req, res) => {
   }
 
   if (url.pathname === "/api/outlook/messages" && req.method === "GET") {
-    const mailbox = url.searchParams.get("mailbox") || "";
+    const mailbox = url.searchParams.get("mailbox") || process.env.OUTLOOK_MAILBOX || "";
     const args = ["-Limit", "40"];
     if (mailbox) {
       args.push("-Mailbox", mailbox);
@@ -171,6 +174,32 @@ function sendJson(res, statusCode, payload) {
 function parsePowerShellJson(output) {
   const cleaned = String(output || "{}").replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, " ");
   return JSON.parse(cleaned);
+}
+
+function loadLocalEnv(filePath) {
+  if (!fs.existsSync(filePath)) {
+    return;
+  }
+
+  const lines = fs.readFileSync(filePath, "utf8").split(/\r?\n/);
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) {
+      continue;
+    }
+
+    const separator = trimmed.indexOf("=");
+    if (separator <= 0) {
+      continue;
+    }
+
+    const key = trimmed.slice(0, separator).trim();
+    const rawValue = trimmed.slice(separator + 1).trim();
+    const value = rawValue.replace(/^["']|["']$/g, "");
+    if (!process.env[key]) {
+      process.env[key] = value;
+    }
+  }
 }
 
 function runPowerShell(scriptPath, args = [], stdin = "") {

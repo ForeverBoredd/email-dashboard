@@ -372,16 +372,10 @@ async function loadOutlookDesktop() {
     return;
   }
 
-  if (!state.settings.outlookMailbox) {
-    showToast("Add an Outlook Desktop mailbox in Settings first.");
-    switchView("settings");
-    return;
-  }
-
   setBusy(true);
   try {
-    const mailbox = encodeURIComponent(state.settings.outlookMailbox);
-    const response = await fetch(`/api/outlook/messages?mailbox=${mailbox}`);
+    const mailbox = state.settings.outlookMailbox ? `?mailbox=${encodeURIComponent(state.settings.outlookMailbox)}` : "";
+    const response = await fetch(`/api/outlook/messages${mailbox}`);
     const data = await response.json();
     if (!response.ok) {
       throw new Error(data.error || "Could not read Outlook Desktop inbox");
